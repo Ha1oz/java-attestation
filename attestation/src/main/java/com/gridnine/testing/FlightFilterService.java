@@ -1,7 +1,4 @@
-package com.gridnine.testing.service;
-
-import com.gridnine.testing.entity.Flight;
-import com.gridnine.testing.filter.api.FlightFilter;
+package com.gridnine.testing;
 
 import java.util.List;
 import java.util.stream.Collectors;

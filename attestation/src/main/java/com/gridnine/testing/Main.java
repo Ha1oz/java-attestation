@@ -1,14 +1,6 @@
 package com.gridnine.testing;
 
 
-import com.gridnine.testing.builder.FlightBuilder;
-import com.gridnine.testing.entity.Flight;
-import com.gridnine.testing.filter.DepartureAfterNowFilter;
-import com.gridnine.testing.filter.DepartureBeforeArrivalFilter;
-import com.gridnine.testing.filter.GroundTimeLessThanManyHoursFilter;
-import com.gridnine.testing.filter.api.FlightFilter;
-import com.gridnine.testing.service.FlightFilterService;
-
 import java.util.List;
 
 public class Main {
