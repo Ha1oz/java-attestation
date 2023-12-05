@@ -22,11 +22,12 @@ public class GroundTimeLessThanManyHoursFilter implements FlightFilter {
     @Override
     public boolean isSuitableFlight(Flight flight) {
         List<Segment> segments = flight.getSegments();
+
         for (int i = 0; i < segments.size() - 1; i++) {
             LocalDateTime currentArrival = segments.get(i).getArrivalDate();
             LocalDateTime nextDeparture = segments.get(i + 1).getDepartureDate();
             Duration groundTime = Duration.between(currentArrival, nextDeparture);
-            if (groundTime.toHours() < hours) {
+            if (groundTime.toHours() <= hours) {
                 return true;
             }
         }

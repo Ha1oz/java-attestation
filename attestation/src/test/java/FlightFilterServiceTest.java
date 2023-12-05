@@ -2,44 +2,61 @@ import com.gridnine.testing.entity.Flight;
 import com.gridnine.testing.entity.Segment;
 import com.gridnine.testing.filter.DepartureAfterNowFilter;
 import com.gridnine.testing.filter.DepartureBeforeArrivalFilter;
+import com.gridnine.testing.filter.GroundTimeLessThanManyHoursFilter;
 import com.gridnine.testing.filter.api.FlightFilter;
 import com.gridnine.testing.service.FlightFilterService;
+import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 public class FlightFilterServiceTest {
     @Test
-    public void testFilterFlights() {
-        // Создаем моки для фильтров
-        FlightFilter departureAfterNowFilter = Mockito.mock(DepartureAfterNowFilter.class);
-        FlightFilter departureBeforeArrivalFilter = Mockito.mock(DepartureBeforeArrivalFilter.class);
+    public void testDepartureAfterNowFilter(){
+        FlightFilter departureAfterNowFilter = new DepartureAfterNowFilter();
+        Flight wrongDataFlight = new Flight(List.of(new Segment(LocalDateTime.now().minusHours(10), LocalDateTime.now().plusHours(3))));
+        Flight correctDataFlight = new Flight(List.of(new Segment(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3))));
 
-        // Создаем список фильтров
-        List<FlightFilter> filters = Arrays.asList(departureAfterNowFilter, departureBeforeArrivalFilter);
+        List<FlightFilter> filters = List.of(departureAfterNowFilter);
+        List<Flight> flights = List.of(wrongDataFlight, correctDataFlight);
 
-        // Создаем список рейсов
-        Flight flight1 = new Flight(List.of(new Segment(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3))));
-        Flight flight2 = new Flight(List.of(new Segment(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2))));
-        List<Flight> flights = Arrays.asList(flight1, flight2);
-
-        // Устанавливаем поведение моков
-        when(departureAfterNowFilter.isSuitableFlight(flight1)).thenReturn(true);
-        when(departureAfterNowFilter.isSuitableFlight(flight2)).thenReturn(false);
-        when(departureBeforeArrivalFilter.isSuitableFlight(flight1)).thenReturn(true);
-        when(departureBeforeArrivalFilter.isSuitableFlight(flight2)).thenReturn(false);
-
-        // Вызываем метод для тестирования
         List<Flight> filteredFlights = FlightFilterService.filterFlights(flights, filters);
 
-        // Проверяем результат
-        assertEquals(1, filteredFlights.size());
-        assertEquals(flight1, filteredFlights.get(0));
+        Assert.assertFalse(filteredFlights.contains(wrongDataFlight));
+        Assert.assertTrue(filteredFlights.contains(correctDataFlight));
+    }
+    @Test
+    public void testDepartureBeforeArrivalFilter(){
+        FlightFilter departureAfterNowFilter = new DepartureBeforeArrivalFilter();
+        Flight wrongDataFlight = new Flight(List.of(new Segment(LocalDateTime.now().plusHours(10), LocalDateTime.now().plusHours(3))));
+        Flight correctDataFlight = new Flight(List.of(new Segment(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3))));
+
+        List<FlightFilter> filters = List.of(departureAfterNowFilter);
+        List<Flight> flights = List.of(wrongDataFlight, correctDataFlight);
+
+        List<Flight> filteredFlights = FlightFilterService.filterFlights(flights, filters);
+
+        Assert.assertFalse(filteredFlights.contains(wrongDataFlight));
+        Assert.assertTrue(filteredFlights.contains(correctDataFlight));
+    }
+    @Test
+    public void testGroundTimeLessThan2HoursFilter(){
+        int groundTimeInHours = 2;
+        FlightFilter departureAfterNowFilter = new GroundTimeLessThanManyHoursFilter(groundTimeInHours);
+        Flight wrongDataFlight = new Flight(List.of(
+                new Segment(LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(10)),
+                new Segment(LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1).plusHours(3))));
+        Flight correctDataFlight = new Flight(List.of(
+                new Segment(LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(3)),
+                new Segment(LocalDateTime.now().plusHours(5), LocalDateTime.now().plusHours(8))));
+
+        List<FlightFilter> filters = List.of(departureAfterNowFilter);
+        List<Flight> flights = List.of(wrongDataFlight, correctDataFlight);
+
+        List<Flight> filteredFlights = FlightFilterService.filterFlights(flights, filters);
+
+        Assert.assertFalse(filteredFlights.contains(wrongDataFlight));
+        Assert.assertTrue(filteredFlights.contains(correctDataFlight));
     }
 }

@@ -21,6 +21,7 @@ public class Main {
         FlightFilter filter3 = new GroundTimeLessThanManyHoursFilter(2);
         List<FlightFilter> filters = List.of(filter, filter2, filter3);
 
-        System.out.println("filteredFlights  = " + FlightFilterService.filterFlights(flights, filters));
+        FlightFilterService service = new FlightFilterService(filters);
+        System.out.println("filteredFlights  = " + service.filterFlights(flights));
     }
 }
